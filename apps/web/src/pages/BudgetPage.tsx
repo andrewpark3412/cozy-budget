@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -11,6 +11,8 @@ import {
   useDeleteBudgetItem,
   useCopyBudget,
   calcBudgetSummary,
+  calcSpent,
+  type BudgetItemWithRelations,
 } from '@/hooks/useBudget'
 import { useCategories } from '@/hooks/useCategories'
 import MonthNav from '@/components/budget/MonthNav'
@@ -18,6 +20,7 @@ import LeftToBudgetBanner from '@/components/budget/LeftToBudgetBanner'
 import CategorySection from '@/components/budget/CategorySection'
 import AddBudgetItemDialog from '@/components/budget/AddBudgetItemDialog'
 import CopyBudgetDialog from '@/components/budget/CopyBudgetDialog'
+import TransactionDrawer from '@/components/budget/TransactionDrawer'
 
 const BudgetPage = () => {
   const { selectedMonth, selectedYear } = useBudgetStore()
@@ -25,6 +28,10 @@ const BudgetPage = () => {
 
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [copyDialogOpen, setCopyDialogOpen] = useState(false)
+  const [drawerItem, setDrawerItem] = useState<BudgetItemWithRelations | null>(null)
+
+  // Track spending state per item to fire alert toasts only once per threshold crossing
+  const alertedItems = useRef<Map<string, 'warning' | 'danger'>>(new Map())
 
   const { data: budget, isLoading: budgetLoading, error: budgetError } = useBudget(
     selectedMonth,
@@ -101,6 +108,43 @@ const BudgetPage = () => {
     await copyBudget.mutateAsync({ sourceMonth, sourceYear })
   }
 
+  // Fire budget alert toasts when an item crosses 90% or 100% thresholds.
+  // Only fire once per crossing (tracked in alertedItems ref).
+  const checkAlerts = (updatedItem: BudgetItemWithRelations) => {
+    const spent = calcSpent(updatedItem)
+    const pct = updatedItem.plannedAmount > 0 ? spent / updatedItem.plannedAmount : 0
+    const prev = alertedItems.current.get(updatedItem.id)
+
+    if (pct > 1 && prev !== 'danger') {
+      alertedItems.current.set(updatedItem.id, 'danger')
+      toast({
+        title: `🚨 Over budget: ${updatedItem.category.name}`,
+        description: 'You have exceeded your planned amount for this category.',
+        variant: 'destructive',
+      })
+    } else if (pct >= 0.9 && pct <= 1 && prev !== 'warning' && prev !== 'danger') {
+      alertedItems.current.set(updatedItem.id, 'warning')
+      toast({
+        title: `⚠️ Nearing limit: ${updatedItem.category.name}`,
+        description: 'You have used 90% of your planned amount.',
+      })
+    } else if (pct < 0.9) {
+      alertedItems.current.delete(updatedItem.id)
+    }
+  }
+
+  const handleOpenTransactions = (item: BudgetItemWithRelations) => {
+    setDrawerItem(item)
+  }
+
+  // Keep drawerItem in sync with live budget data (so the drawer reflects new transactions)
+  const liveDrawerItem = drawerItem
+    ? (budget?.items.find((i) => i.id === drawerItem.id) ?? drawerItem)
+    : null
+
+  // Check alerts whenever budget data updates
+  budget?.items.forEach(checkAlerts)
+
   return (
     <div className="p-4 md:p-6 space-y-4 max-w-2xl mx-auto">
       {/* Page header */}
@@ -158,6 +202,7 @@ const BudgetPage = () => {
           onUpdateAmount={handleUpdateAmount}
           onDeleteItem={handleDeleteItem}
           onAddItem={() => setAddDialogOpen(true)}
+          onOpenTransactions={handleOpenTransactions}
         />
       )}
 
@@ -169,6 +214,7 @@ const BudgetPage = () => {
           onUpdateAmount={handleUpdateAmount}
           onDeleteItem={handleDeleteItem}
           onAddItem={() => setAddDialogOpen(true)}
+          onOpenTransactions={handleOpenTransactions}
         />
       )}
 
@@ -186,6 +232,14 @@ const BudgetPage = () => {
         currentMonth={selectedMonth}
         currentYear={selectedYear}
         onCopy={handleCopy}
+      />
+
+      <TransactionDrawer
+        item={liveDrawerItem}
+        open={!!drawerItem}
+        onOpenChange={(open) => { if (!open) setDrawerItem(null) }}
+        month={selectedMonth}
+        year={selectedYear}
       />
     </div>
   )

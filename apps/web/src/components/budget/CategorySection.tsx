@@ -12,6 +12,7 @@ interface Props {
   onUpdateAmount: (itemId: string, cents: number) => Promise<void>
   onDeleteItem: (itemId: string) => void
   onAddItem: () => void
+  onOpenTransactions: (item: BudgetItemWithRelations) => void
   defaultExpanded?: boolean
 }
 
@@ -21,6 +22,7 @@ const CategorySection = ({
   onUpdateAmount,
   onDeleteItem,
   onAddItem,
+  onOpenTransactions,
   defaultExpanded = true,
 }: Props) => {
   const [expanded, setExpanded] = useState(defaultExpanded)
@@ -67,6 +69,7 @@ const CategorySection = ({
                   item={item}
                   onUpdateAmount={onUpdateAmount}
                   onDelete={onDeleteItem}
+                  onOpenTransactions={onOpenTransactions}
                 />
               ))}
             </div>

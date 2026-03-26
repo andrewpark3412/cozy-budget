@@ -11,9 +11,10 @@ interface Props {
   item: BudgetItemWithRelations
   onUpdateAmount: (itemId: string, cents: number) => Promise<void>
   onDelete: (itemId: string) => void
+  onOpenTransactions: (item: BudgetItemWithRelations) => void
 }
 
-const BudgetItemRow = ({ item, onUpdateAmount, onDelete }: Props) => {
+const BudgetItemRow = ({ item, onUpdateAmount, onDelete, onOpenTransactions }: Props) => {
   const [editing, setEditing] = useState(false)
   const [inputVal, setInputVal] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -50,8 +51,15 @@ const BudgetItemRow = ({ item, onUpdateAmount, onDelete }: Props) => {
 
   return (
     <div className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted/50">
-      {/* Category name */}
-      <span className="flex-1 truncate text-sm text-foreground">{item.category.name}</span>
+      {/* Category name — click to open transaction drawer */}
+      <button
+        type="button"
+        onClick={() => onOpenTransactions(item)}
+        className="flex-1 truncate text-left text-sm text-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+        aria-label={`View transactions for ${item.category.name}`}
+      >
+        {item.category.name}
+      </button>
 
       {/* Spent */}
       <span
