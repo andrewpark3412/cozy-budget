@@ -9,6 +9,7 @@ import SavingsPage from '@/pages/SavingsPage'
 import DebtPage from '@/pages/DebtPage'
 import ReportsPage from '@/pages/ReportsPage'
 import SettingsPage from '@/pages/SettingsPage'
+import RecurringPage from '@/pages/RecurringPage'
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/savings" element={<SavingsPage />} />
             <Route path="/debt" element={<DebtPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/recurring" element={<RecurringPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>

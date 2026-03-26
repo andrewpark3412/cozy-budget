@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,6 +14,8 @@ import {
   calcSpent,
   type BudgetItemWithRelations,
 } from '@/hooks/useBudget'
+import { useQueryClient } from '@tanstack/react-query'
+import { api } from '@/lib/api'
 import { useCategories } from '@/hooks/useCategories'
 import MonthNav from '@/components/budget/MonthNav'
 import LeftToBudgetBanner from '@/components/budget/LeftToBudgetBanner'
@@ -43,6 +45,22 @@ const BudgetPage = () => {
   const updateItem = useUpdateBudgetItem(budget?.id ?? '', selectedMonth, selectedYear)
   const deleteItem = useDeleteBudgetItem(budget?.id ?? '', selectedMonth, selectedYear)
   const copyBudget = useCopyBudget(budget?.id ?? '', selectedMonth, selectedYear)
+
+  // Auto-apply recurring items on first load of a new budget month
+  const queryClient = useQueryClient()
+  useEffect(() => {
+    if (!budget || budget.recurringApplied === 1) return
+    api
+      .post<{ created: number }>(`/api/budgets/${budget.id}/apply-recurring`, {})
+      .then((res) => {
+        if (!res.error && res.data && res.data.created > 0) {
+          queryClient.invalidateQueries({ queryKey: ['budget', selectedMonth, selectedYear] })
+        }
+      })
+      .catch(() => {
+        // Non-critical — recurring apply errors should not break the UI
+      })
+  }, [budget?.id, budget?.recurringApplied, selectedMonth, selectedYear, queryClient])
 
   if (budgetLoading || categoriesLoading) {
     return (

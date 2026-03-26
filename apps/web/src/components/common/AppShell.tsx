@@ -4,6 +4,7 @@ import {
   PiggyBank,
   CreditCard,
   BarChart2,
+  RefreshCw,
   Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -13,6 +14,7 @@ const navItems = [
   { to: '/savings', label: 'Savings', icon: PiggyBank },
   { to: '/debt', label: 'Debt', icon: CreditCard },
   { to: '/reports', label: 'Reports', icon: BarChart2 },
+  { to: '/recurring', label: 'Recurring', icon: RefreshCw },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
