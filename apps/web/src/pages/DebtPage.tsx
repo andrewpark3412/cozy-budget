@@ -11,6 +11,7 @@ import {
   ArrowDown,
   ChevronDown,
   ChevronRight,
+  AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -223,7 +224,7 @@ const DebtCard = ({
 
 // ---- main page ----
 const DebtPage = () => {
-  const { data: debts, isLoading } = useDebts()
+  const { data: debts, isLoading, isError } = useDebts()
   const createDebt = useCreateDebt()
   const updateDebt = useUpdateDebt()
   const deleteDebt = useDeleteDebt()
@@ -334,8 +335,16 @@ const DebtPage = () => {
         </p>
       )}
 
+      {/* error */}
+      {isError && (
+        <div className="flex items-center gap-3 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
+          <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+          Failed to load debts. Please refresh the page.
+        </div>
+      )}
+
       {/* loading */}
-      {isLoading && (
+      {!isError && isLoading && (
         <div className="space-y-3">
           {[1, 2].map((i) => (
             <Skeleton key={i} className="h-36 w-full rounded-xl" />
@@ -344,7 +353,7 @@ const DebtPage = () => {
       )}
 
       {/* empty */}
-      {!isLoading && debts?.length === 0 && (
+      {!isError && !isLoading && debts?.length === 0 && (
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
           <CreditCard className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
           <p className="font-medium text-foreground">No debts tracked</p>
@@ -357,8 +366,8 @@ const DebtPage = () => {
         </div>
       )}
 
-      {/* active debts */}
-      {!isLoading && active.length > 0 && (
+      {/* active debts — only rendered when not in error/loading state */}
+      {!isError && !isLoading && active.length > 0 && (
         <div className="space-y-3">
           {active.map((debt, idx) => (
             <DebtCard
@@ -380,7 +389,7 @@ const DebtPage = () => {
       )}
 
       {/* paid off */}
-      {!isLoading && paidOff.length > 0 && (
+      {!isError && !isLoading && paidOff.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Paid Off 🎉

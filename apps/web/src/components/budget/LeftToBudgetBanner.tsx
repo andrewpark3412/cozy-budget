@@ -13,6 +13,9 @@ const LeftToBudgetBanner = ({ totalIncome, totalPlanned, leftToBudget }: Props) 
 
   return (
     <div
+      role="status"
+      aria-live="polite"
+      aria-label={`Left to budget: ${formatCurrency(Math.abs(leftToBudget))}${isOver ? ' over budget' : ''}`}
       className={cn(
         'rounded-2xl p-4 md:p-5',
         isOver

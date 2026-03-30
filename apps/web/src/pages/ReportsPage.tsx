@@ -17,7 +17,7 @@ import {
 } from 'recharts'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { TrendingDown, TrendingUp, Tag } from 'lucide-react'
+import { TrendingDown, TrendingUp, Tag, AlertCircle } from 'lucide-react'
 import { api } from '@/lib/api'
 import { formatCurrency } from '@/lib/formatters'
 
@@ -97,7 +97,7 @@ const ReportsPage = () => {
   const [windowMonths, setWindowMonths] = useState(6)
   const [selectedMonth, setSelectedMonth] = useState<MonthReport | null>(null)
 
-  const { data: reports, isLoading } = useQuery({
+  const { data: reports, isLoading, isError } = useQuery({
     queryKey: ['reports-monthly', windowMonths],
     queryFn: async () => {
       const res = await api.get<MonthReport[]>(`/api/reports/monthly?months=${windowMonths}`)
@@ -150,8 +150,16 @@ const ReportsPage = () => {
         </div>
       </div>
 
+      {/* error */}
+      {isError && (
+        <div className="flex items-center gap-3 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
+          <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+          Failed to load report data. Please refresh the page.
+        </div>
+      )}
+
       {/* loading skeletons */}
-      {isLoading && (
+      {!isError && isLoading && (
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <Skeleton className="h-20 rounded-xl" />
@@ -166,7 +174,7 @@ const ReportsPage = () => {
       )}
 
       {/* no data */}
-      {!isLoading && reports?.length === 0 && (
+      {!isError && !isLoading && reports?.length === 0 && (
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
           <p className="font-medium text-foreground">No data yet</p>
           <p className="text-sm text-muted-foreground mt-1">
@@ -176,7 +184,7 @@ const ReportsPage = () => {
       )}
 
       {/* ---- summary cards ---- */}
-      {!isLoading && summary && (
+      {!isError && !isLoading && summary && (
         <div className="grid grid-cols-3 gap-3">
           <div className="rounded-xl border border-border bg-surface p-4 shadow-sm text-center">
             <TrendingUp className="h-5 w-5 mx-auto mb-1.5 text-[#5A8C6A]" />
@@ -202,7 +210,7 @@ const ReportsPage = () => {
       )}
 
       {/* ---- monthly overview bar chart ---- */}
-      {!isLoading && barData.length > 0 && (
+      {!isError && !isLoading && barData.length > 0 && (
         <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
           <h2 className="text-sm font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
             Monthly Overview
@@ -236,7 +244,7 @@ const ReportsPage = () => {
       )}
 
       {/* ---- spending trend line chart ---- */}
-      {!isLoading && barData.length > 1 && (
+      {!isError && !isLoading && barData.length > 1 && (
         <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
           <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">
             Spending Trend
@@ -274,7 +282,7 @@ const ReportsPage = () => {
       )}
 
       {/* ---- budget vs actual (horizontal bar) ---- */}
-      {!isLoading && displayMonth && bvaData.length > 0 && (
+      {!isError && !isLoading && displayMonth && bvaData.length > 0 && (
         <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -316,7 +324,7 @@ const ReportsPage = () => {
       )}
 
       {/* ---- category pie / breakdown ---- */}
-      {!isLoading && displayMonth && (
+      {!isError && !isLoading && displayMonth && (
         <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">

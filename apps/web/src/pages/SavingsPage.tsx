@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Pencil, Trash2, PiggyBank, CheckCircle2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, PiggyBank, CheckCircle2, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -128,7 +128,7 @@ const GoalCard = ({
 
 // --------------- main page ---------------
 const SavingsPage = () => {
-  const { data: goals, isLoading } = useSavingsGoals()
+  const { data: goals, isLoading, isError } = useSavingsGoals()
   const createGoal = useCreateSavingsGoal()
   const updateGoal = useUpdateSavingsGoal()
   const deleteGoal = useDeleteSavingsGoal()
@@ -206,8 +206,16 @@ const SavingsPage = () => {
         </Button>
       </div>
 
+      {/* Error */}
+      {isError && (
+        <div className="flex items-center gap-3 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
+          <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+          Failed to load savings goals. Please refresh the page.
+        </div>
+      )}
+
       {/* Loading */}
-      {isLoading && (
+      {!isError && isLoading && (
         <div className="space-y-3">
           {[1, 2].map((i) => (
             <Skeleton key={i} className="h-36 w-full rounded-xl" />
@@ -216,7 +224,7 @@ const SavingsPage = () => {
       )}
 
       {/* Active goals */}
-      {!isLoading && active.length === 0 && completed.length === 0 && (
+      {!isError && !isLoading && active.length === 0 && completed.length === 0 && (
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
           <PiggyBank className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
           <p className="font-medium text-foreground">No savings goals yet</p>
@@ -229,7 +237,7 @@ const SavingsPage = () => {
         </div>
       )}
 
-      {!isLoading && active.length > 0 && (
+      {!isError && !isLoading && active.length > 0 && (
         <div className="space-y-3">
           {active.map((g) => (
             <GoalCard
@@ -247,7 +255,7 @@ const SavingsPage = () => {
       )}
 
       {/* Completed goals */}
-      {!isLoading && completed.length > 0 && (
+      {!isError && !isLoading && completed.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Completed

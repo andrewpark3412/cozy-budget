@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Pencil, Trash2, RefreshCw } from 'lucide-react'
+import { Plus, Pencil, Trash2, RefreshCw, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -54,7 +54,7 @@ const ORDINALS = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th',
 
 const RecurringPage = () => {
   const { toast } = useToast()
-  const { data: items = [], isLoading } = useRecurringItems()
+  const { data: items = [], isLoading, isError } = useRecurringItems()
   const { data: categories = [] } = useCategories()
 
   const createItem = useCreateRecurringItem()
@@ -161,7 +161,12 @@ const RecurringPage = () => {
         </Button>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <div className="flex items-center gap-3 rounded-2xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
+          <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+          Failed to load recurring items. Please refresh the page.
+        </div>
+      ) : isLoading ? (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-16 w-full rounded-2xl" />
