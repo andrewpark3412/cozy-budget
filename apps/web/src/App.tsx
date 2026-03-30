@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import AppShell from '@/components/common/AppShell'
+import InstallPromptBanner from '@/components/common/InstallPromptBanner'
 import ProtectedRoute from '@/components/common/ProtectedRoute'
 import LoginPage from '@/pages/LoginPage'
 import SignUpPage from '@/pages/SignUpPage'
@@ -36,6 +37,7 @@ const App = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Toaster />
+      <InstallPromptBanner />
     </>
   )
 }
