@@ -11,6 +11,7 @@ import DebtPage from '@/pages/DebtPage'
 import ReportsPage from '@/pages/ReportsPage'
 import SettingsPage from '@/pages/SettingsPage'
 import RecurringPage from '@/pages/RecurringPage'
+import NotFoundPage from '@/pages/NotFoundPage'
 
 const App = () => {
   return (
@@ -33,8 +34,8 @@ const App = () => {
           </Route>
         </Route>
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Toaster />
       <InstallPromptBanner />

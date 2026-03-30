@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import App from './App'
+import ErrorBoundary from '@/components/common/ErrorBoundary'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -20,11 +21,13 @@ if (!rootEl) throw new Error('Root element not found')
 
 createRoot(rootEl).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
