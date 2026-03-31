@@ -21,6 +21,16 @@ export const auth = betterAuth({
     },
   },
   trustedOrigins: (process.env['TRUSTED_ORIGINS'] ?? '').split(',').filter(Boolean),
+  advanced: {
+    cookies: {
+      session_token: {
+        attributes: {
+          sameSite: 'none',
+          secure: true,
+        },
+      },
+    },
+  },
 })
 
 export type Auth = typeof auth
