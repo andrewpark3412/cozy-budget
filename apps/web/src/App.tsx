@@ -12,6 +12,7 @@ import ReportsPage from '@/pages/ReportsPage'
 import SettingsPage from '@/pages/SettingsPage'
 import RecurringPage from '@/pages/RecurringPage'
 import NotFoundPage from '@/pages/NotFoundPage'
+import FAQPage from '@/pages/FAQPage'
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/recurring" element={<RecurringPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/faq" element={<FAQPage />} />
           </Route>
         </Route>
 

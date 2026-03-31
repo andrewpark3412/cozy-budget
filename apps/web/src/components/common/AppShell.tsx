@@ -6,6 +6,7 @@ import {
   BarChart2,
   RefreshCw,
   Settings,
+  HelpCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -17,6 +18,8 @@ const navItems = [
   { to: '/recurring', label: 'Recurring', icon: RefreshCw },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
+
+const secondaryNavItems = [{ to: '/faq', label: 'Help / FAQ', icon: HelpCircle }]
 
 const AppShell = () => {
   return (
@@ -45,6 +48,27 @@ const AppShell = () => {
             </NavLink>
           ))}
         </nav>
+
+        {/* Secondary nav — Help */}
+        <div className="mt-auto border-t border-border p-3">
+          {secondaryNavItems.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-foreground/70 hover:bg-muted hover:text-foreground',
+                )
+              }
+            >
+              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {label}
+            </NavLink>
+          ))}
+        </div>
       </aside>
 
       {/* Main content */}
