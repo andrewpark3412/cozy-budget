@@ -20,7 +20,7 @@ export const auth = betterAuth({
       maxAge: 60 * 5, // 5 minutes
     },
   },
-  trustedOrigins: (process.env['TRUSTED_ORIGINS'] ?? '').split(',').filter(Boolean),
+  trustedOrigins: (process.env.TRUSTED_ORIGINS ?? '').split(',').filter(Boolean),
   advanced: {
     cookies: {
       session_token: {
