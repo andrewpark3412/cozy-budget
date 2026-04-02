@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const ALLOWED_ORIGINS = (process.env['TRUSTED_ORIGINS'] ?? '')
+const ALLOWED_ORIGINS = (process.env.TRUSTED_ORIGINS ?? '')
   .split(',')
   .map((o) => o.trim())
   .filter(Boolean)
