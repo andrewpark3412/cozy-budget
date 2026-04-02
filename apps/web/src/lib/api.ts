@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@cozy-budget/shared'
 
-const API_BASE = import.meta.env['VITE_API_URL'] ?? 'http://localhost:3001'
+const API_BASE = process.env['VITE_API_URL'] ?? 'http://localhost:3001'
 
 async function request<T>(
   path: string,
