@@ -27,6 +27,17 @@ export const auth = betterAuth({
         attributes: {
           sameSite: 'none',
           secure: true,
+          // Opt-in to partitioned cookies where supported to avoid upcoming
+          // third-party cookie rejections in some browsers.
+          // Runtimes/browsers that don't support this attribute will ignore it.
+          partitioned: true,
+        },
+      },
+      session_data: {
+        attributes: {
+          sameSite: 'none',
+          secure: true,
+          partitioned: true,
         },
       },
     },
