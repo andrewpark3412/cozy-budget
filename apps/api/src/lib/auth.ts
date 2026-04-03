@@ -40,6 +40,20 @@ export const auth = betterAuth({
           partitioned: true,
         },
       },
+      dont_remember: {
+        attributes: {
+          sameSite: 'none',
+          secure: true,
+          partitioned: true,
+        },
+      },
+      account_data: {
+        attributes: {
+          sameSite: 'none',
+          secure: true,
+          partitioned: true,
+        },
+      },
     },
   },
 })
