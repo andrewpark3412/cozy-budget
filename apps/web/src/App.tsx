@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import AppShell from '@/components/common/AppShell'
 import InstallPromptBanner from '@/components/common/InstallPromptBanner'
+import UpdateAvailableBanner from '@/components/common/UpdateAvailableBanner'
 import ProtectedRoute from '@/components/common/ProtectedRoute'
 import LoginPage from '@/pages/LoginPage'
 import SignUpPage from '@/pages/SignUpPage'
@@ -41,6 +42,7 @@ const App = () => {
       </Routes>
       <Toaster />
       <InstallPromptBanner />
+      <UpdateAvailableBanner />
     </>
   )
 }

@@ -12,6 +12,8 @@ const STORAGE_KEY = 'cozy-pwa-install-dismissed'
 const InstallPromptBanner = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [visible, setVisible] = useState(false)
+  const [isInstructionOnly, setIsInstructionOnly] = useState(false)
+  const [detectedPlatform, setDetectedPlatform] = useState<'ios' | 'firefox-android' | 'firefox-desktop' | 'android-chrome' | 'other' | null>(null)
 
   useEffect(() => {
     // Don't show if already dismissed
@@ -24,6 +26,34 @@ const InstallPromptBanner = () => {
     }
 
     window.addEventListener('beforeinstallprompt', handler)
+
+    // Some browsers (iOS Safari, Firefox, etc.) don't fire `beforeinstallprompt` — show manual instructions
+    const ua = window.navigator.userAgent.toLowerCase()
+    const isIos = /iphone|ipad|ipod/.test(ua)
+    const isFirefox = /firefox/.test(ua)
+    const isAndroid = /android/.test(ua)
+    const isInStandalone = ('standalone' in window.navigator && (window.navigator as any).standalone) || window.matchMedia('(display-mode: standalone)').matches
+
+    if (!isInStandalone) {
+      if (isIos) {
+        setDetectedPlatform('ios')
+        setIsInstructionOnly(true)
+        setVisible(true)
+      } else if (isFirefox && isAndroid) {
+        setDetectedPlatform('firefox-android')
+        setIsInstructionOnly(true)
+        setVisible(true)
+      } else if (isFirefox) {
+        setDetectedPlatform('firefox-desktop')
+        setIsInstructionOnly(true)
+        setVisible(true)
+      } else if (isAndroid) {
+        setDetectedPlatform('android-chrome')
+        setIsInstructionOnly(true)
+        setVisible(true)
+      }
+    }
+
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 
@@ -55,14 +85,46 @@ const InstallPromptBanner = () => {
           <p className="text-xs text-muted-foreground mt-0.5">
             Add to your home screen for quick access, even offline.
           </p>
+          {isInstructionOnly && (
+            <div className="text-xs text-muted-foreground mt-2">
+              <p className="mb-1">Installation instructions:</p>
+              <ul className="list-disc pl-4">
+                {detectedPlatform === 'ios' && (
+                  <li>iOS (Safari): Tap <strong>Share</strong> &gt; <strong>Add to Home Screen</strong>.</li>
+                )}
+                {detectedPlatform === 'firefox-android' && (
+                  <li>Firefox (Android): Open the browser menu and choose <strong>Install</strong> or <strong>Add to Home screen</strong>.</li>
+                )}
+                {detectedPlatform === 'firefox-desktop' && (
+                  <li>Firefox (Desktop): Use the install icon in the address bar or Page Actions → <strong>Install</strong>.</li>
+                )}
+                {detectedPlatform === 'android-chrome' && (
+                  <li>Android (Chrome): Open menu (⋮) &gt; <strong>Add to Home screen</strong>.</li>
+                )}
+                {(!detectedPlatform || detectedPlatform === 'other') && (
+                  <li>Use your browser's menu or install controls to add Cozy Budget to your device.</li>
+                )}
+              </ul>
+            </div>
+          )}
           <div className="flex gap-2 mt-3">
-            <Button
-              size="sm"
-              className="bg-[#7C9A7E] hover:bg-[#6b8a6d] text-white h-8 text-xs"
-              onClick={handleInstall}
-            >
-              Install
-            </Button>
+            {deferredPrompt ? (
+              <Button
+                size="sm"
+                className="bg-[#7C9A7E] hover:bg-[#6b8a6d] text-white h-8 text-xs"
+                onClick={handleInstall}
+              >
+                Install
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                className="bg-[#7C9A7E] hover:bg-[#6b8a6d] text-white h-8 text-xs"
+                onClick={() => setVisible(false)}
+              >
+                Got it
+              </Button>
+            )}
             <Button
               size="sm"
               variant="outline"
