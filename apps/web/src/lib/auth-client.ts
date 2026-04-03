@@ -5,3 +5,8 @@ export const authClient = createAuthClient({
 })
 
 export const { signIn, signUp, signOut, useSession } = authClient
+
+if (import.meta.env.MODE === 'production' && (import.meta.env['VITE_API_URL'] ?? '').includes('localhost')) {
+  console.error('VITE_API_URL missing in production for auth client')
+  throw new Error('VITE_API_URL is not set for production. Set it in your production env and rebuild.')
+}
