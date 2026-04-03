@@ -2,6 +2,10 @@ import { createAuthClient } from 'better-auth/react'
 
 export const authClient = createAuthClient({
   baseURL: import.meta.env['VITE_API_URL'] ?? 'http://localhost:3001',
+  fetchOptions: {
+    // Ensure fetch sends credentials so cross-site cookies are included
+    credentials: 'include',
+  },
 })
 
 export const { signIn, signUp, signOut, useSession } = authClient

@@ -63,5 +63,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    proxy: {
+      // Proxy API requests to the local API server so cookies are same-site
+      // during local development. This avoids cross-site cookie rejections.
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 })

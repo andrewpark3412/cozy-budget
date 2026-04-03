@@ -27,6 +27,8 @@ export const auth = betterAuth({
         attributes: {
           sameSite: 'none',
           secure: true,
+          // Optionally set a shared domain for cross-subdomain cookies in production
+          ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {}),
           // Opt-in to partitioned cookies where supported to avoid upcoming
           // third-party cookie rejections in some browsers.
           // Runtimes/browsers that don't support this attribute will ignore it.
@@ -44,6 +46,7 @@ export const auth = betterAuth({
         attributes: {
           sameSite: 'none',
           secure: true,
+          ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {}),
           partitioned: true,
         },
       },
@@ -51,6 +54,7 @@ export const auth = betterAuth({
         attributes: {
           sameSite: 'none',
           secure: true,
+          ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {}),
           partitioned: true,
         },
       },
