@@ -73,4 +73,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // increase warning threshold and split vendor code into chunks
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts')) return 'reports-charts'
+            if (id.includes('lucide-react')) return 'icons'
+            return 'vendor'
+          }
+        },
+      },
+    },
+  },
 })
