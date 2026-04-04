@@ -67,7 +67,7 @@ export async function POST(
 
   // Return the updated budget with items
   const updated = await db.query.budgets.findFirst({
-    where: eq(budgets.id, id),
+    where: and(eq(budgets.id, id), eq(budgets.userId, auth.userId)),
     with: { items: { with: { category: true, transactions: true } } },
   })
 

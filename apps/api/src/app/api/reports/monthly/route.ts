@@ -4,7 +4,7 @@ import { db } from '@/db'
 import { budgets, budgetItems } from '@/db/schema/budgets'
 import { transactions } from '@/db/schema/transactions'
 import { categories } from '@/db/schema/categories'
-import { eq, and, desc, gte } from 'drizzle-orm'
+import { eq, and, desc } from 'drizzle-orm'
 
 // Returns last N months of spending vs. planned data
 export async function GET(req: NextRequest) {
@@ -40,13 +40,8 @@ export async function GET(req: NextRequest) {
       const txRows = await db
         .select({ budgetItemId: transactions.budgetItemId, amount: transactions.amount })
         .from(transactions)
-        .where(
-          and(
-            gte(transactions.budgetItemId, '0'), // all
-            eq(budgetItems.budgetId, budget.id)
-          )
-        )
         .innerJoin(budgetItems, eq(transactions.budgetItemId, budgetItems.id))
+        .where(eq(budgetItems.budgetId, budget.id))
 
       // Sum spent per item
       const spentMap = new Map<string, number>()

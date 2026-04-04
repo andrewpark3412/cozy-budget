@@ -42,7 +42,7 @@ export async function POST(
 
   if (activeRecurring.length === 0) {
     // Mark as applied even if nothing to do, so we don't re-check every load
-    await db.update(budgets).set({ recurringApplied: 1 }).where(eq(budgets.id, id))
+    await db.update(budgets).set({ recurringApplied: 1 }).where(and(eq(budgets.id, id), eq(budgets.userId, auth.userId)))
     return NextResponse.json({ data: { created: 0 }, error: null })
   }
 
@@ -81,7 +81,7 @@ export async function POST(
     await db.insert(transactions).values(txsToCreate)
   }
 
-  await db.update(budgets).set({ recurringApplied: 1 }).where(eq(budgets.id, id))
+  await db.update(budgets).set({ recurringApplied: 1 }).where(and(eq(budgets.id, id), eq(budgets.userId, auth.userId)))
 
   return NextResponse.json({ data: { created: txsToCreate.length }, error: null })
 }

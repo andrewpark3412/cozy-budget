@@ -25,20 +25,33 @@ export async function GET(
 
   const { searchParams } = req.nextUrl
   const itemId = searchParams.get('itemId')
+  // If an itemId is provided, verify it belongs to the requested budget
+  if (itemId) {
+    const item = await db.query.budgetItems.findFirst({
+      where: and(eq(budgetItems.id, itemId), eq(budgetItems.budgetId, id)),
+    })
+
+    if (!item) {
+      return NextResponse.json({ data: null, error: 'Budget item not found' }, { status: 404 })
+    }
+
+    const rows = await db.query.transactions.findMany({
+      where: (t, { eq }) => eq(t.budgetItemId, itemId),
+      with: { budgetItem: true },
+      orderBy: (t, { desc }) => [desc(t.date), desc(t.createdAt)],
+    })
+
+    return NextResponse.json({ data: rows, error: null })
+  }
 
   // Fetch transactions for this budget by joining through budget_items
   const rows = await db.query.transactions.findMany({
-    where: itemId
-      ? (t, { eq }) => eq(t.budgetItemId, itemId)
-      : undefined,
     with: { budgetItem: true },
     orderBy: (t, { desc }) => [desc(t.date), desc(t.createdAt)],
   })
 
   // Filter to only this budget's items when no itemId is specified
-  const filtered = itemId
-    ? rows
-    : rows.filter((t) => t.budgetItem.budgetId === id)
+  const filtered = rows.filter((t) => t.budgetItem.budgetId === id)
 
   return NextResponse.json({ data: filtered, error: null })
 }
