@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { eq, and } from 'drizzle-orm'
 import { db } from '@/db'
-import { budgets, transactions } from '@/db/schema'
+import { budgets, budgetItems, transactions } from '@/db/schema'
 import { requireAuth } from '@/middleware/requireAuth'
 
 // GET /api/budgets/:id/transactions?itemId=
