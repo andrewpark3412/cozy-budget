@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { authClient } from '@/lib/auth-client'
+import { signOutAndClear } from '@/lib/auth-client'
 
 interface AuthStore {
   /** Trigger a sign-out and clear local state. */
@@ -13,6 +13,6 @@ interface AuthStore {
  */
 export const useAuthStore = create<AuthStore>()(() => ({
   signOut: async () => {
-    await authClient.signOut()
+    await signOutAndClear()
   },
 }))

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { signOut, useSession } from '@/lib/auth-client'
+import { signOutAndClear, useSession } from '@/lib/auth-client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -204,7 +204,7 @@ const SettingsPage = () => {
   })
 
   const handleSignOut = async () => {
-    await signOut()
+    await signOutAndClear()
     navigate('/login')
   }
 

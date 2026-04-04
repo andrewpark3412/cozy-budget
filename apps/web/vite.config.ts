@@ -44,13 +44,11 @@ export default defineConfig({
         clientsClaim: true,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
-              networkTimeoutSeconds: 10,
-            },
+            // Never cache authenticated API responses in the service worker;
+            // always forward to network so responses respect server-side
+            // Cache-Control: no-store and cannot be reused across sessions.
+            urlPattern: /^https:\/\/.*\/api\/.*$/i,
+            handler: 'NetworkOnly',
           },
         ],
       },

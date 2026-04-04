@@ -20,6 +20,8 @@ function applyCors(res: NextResponse, origin: string | null): NextResponse {
       'Access-Control-Allow-Headers',
       'Content-Type, Authorization',
     )
+    // Prevent browsers and service workers from caching authenticated API responses
+    res.headers.set('Cache-Control', 'no-store')
   }
   return res
 }
