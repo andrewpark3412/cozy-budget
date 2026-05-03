@@ -46,10 +46,10 @@ const BudgetPage = () => {
   const deleteItem = useDeleteBudgetItem(budget?.id ?? '', selectedMonth, selectedYear)
   const copyBudget = useCopyBudget(budget?.id ?? '', selectedMonth, selectedYear)
 
-  // Auto-apply recurring items on first load of a new budget month
+  // Reconcile recurring items when a budget month loads or its line structure changes.
   const queryClient = useQueryClient()
   useEffect(() => {
-    if (!budget || budget.recurringApplied === 1) return
+    if (!budget) return
     api
       .post<{ created: number }>(`/api/budgets/${budget.id}/apply-recurring`, {})
       .then((res) => {
@@ -60,7 +60,7 @@ const BudgetPage = () => {
       .catch(() => {
         // Non-critical — recurring apply errors should not break the UI
       })
-  }, [budget?.id, budget?.recurringApplied, selectedMonth, selectedYear, queryClient])
+  }, [budget?.id, budget?.items.length, selectedMonth, selectedYear, queryClient])
 
   if (budgetLoading || categoriesLoading) {
     return (

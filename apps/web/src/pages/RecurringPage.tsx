@@ -34,7 +34,7 @@ import {
   type RecurringItemWithCategory,
 } from '@/hooks/useRecurringItems'
 import { useCategories } from '@/hooks/useCategories'
-import { formatCurrency } from '@/lib/formatters'
+import { centsToDollars, dollarsToCents, formatCurrency, isValidAmountInput } from '@/lib/formatters'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required').max(200),
@@ -42,7 +42,7 @@ const schema = z.object({
   amount: z
     .string()
     .min(1)
-    .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) > 0, 'Must be positive'),
+    .refine((v) => isValidAmountInput(v, 0.01), 'Must be positive'),
   dayOfMonth: z.coerce.number().int().min(1).max(31),
 })
 
@@ -86,14 +86,14 @@ const RecurringPage = () => {
     reset({
       name: item.name,
       categoryId: item.categoryId,
-      amount: (item.amount / 100).toFixed(2),
+      amount: centsToDollars(item.amount),
       dayOfMonth: item.dayOfMonth,
     })
     setDialogOpen(true)
   }
 
   const onSubmit = async (data: FormValues) => {
-    const amountCents = Math.round(parseFloat(data.amount) * 100)
+    const amountCents = dollarsToCents(data.amount)
     try {
       if (editing) {
         await updateItem.mutateAsync({

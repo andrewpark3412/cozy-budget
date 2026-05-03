@@ -13,13 +13,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { Category } from '@cozy-budget/shared'
 import { useToast } from '@/hooks/use-toast'
+import { dollarsToCents, isValidAmountInput } from '@/lib/formatters'
 
 const schema = z.object({
   categoryId: z.string().min(1, 'Please select a category'),
   plannedAmount: z
     .string()
     .min(1, 'Amount is required')
-    .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) >= 0, {
+    .refine((v) => isValidAmountInput(v, 0), {
       message: 'Enter a valid amount',
     }),
 })
@@ -47,7 +48,7 @@ const AddBudgetItemDialog = ({ open, onOpenChange, availableCategories, onAdd }:
   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
   const onSubmit = async (data: FormValues) => {
-    const cents = Math.round(parseFloat(data.plannedAmount) * 100)
+    const cents = dollarsToCents(data.plannedAmount)
     try {
       await onAdd(data.categoryId, cents)
       reset()

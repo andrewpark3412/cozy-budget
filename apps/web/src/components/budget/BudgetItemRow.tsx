@@ -3,7 +3,7 @@ import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { formatCurrency } from '@/lib/formatters'
+import { centsToDollars, dollarsToCents, formatCurrency, isValidAmountInput } from '@/lib/formatters'
 import type { BudgetItemWithRelations } from '@/hooks/useBudget'
 import { calcSpent } from '@/hooks/useBudget'
 
@@ -29,14 +29,13 @@ const BudgetItemRow = ({ item, onUpdateAmount, onDelete, onOpenTransactions }: P
   }, [editing])
 
   const startEditing = () => {
-    setInputVal((item.plannedAmount / 100).toFixed(2))
+    setInputVal(centsToDollars(item.plannedAmount))
     setEditing(true)
   }
 
   const commitEdit = async () => {
-    const dollars = parseFloat(inputVal)
-    if (!isNaN(dollars) && dollars >= 0) {
-      const cents = Math.round(dollars * 100)
+    if (isValidAmountInput(inputVal, 0)) {
+      const cents = dollarsToCents(inputVal)
       if (cents !== item.plannedAmount) {
         await onUpdateAmount(item.id, cents)
       }

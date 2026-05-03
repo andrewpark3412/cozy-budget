@@ -4,6 +4,7 @@ import { db } from '@/db'
 import { budgets, budgetItems } from '@/db/schema'
 import { requireAuth } from '@/middleware/requireAuth'
 import { parseBody } from '@/lib/validation'
+import { applyRecurringToBudget } from '@/lib/applyRecurring'
 import { createBudgetItemSchema } from '@cozy-budget/shared'
 
 // GET /api/budgets/:id/items
@@ -69,6 +70,8 @@ export async function POST(
     .insert(budgetItems)
     .values({ budgetId: id, categoryId: body.categoryId, plannedAmount: body.plannedAmount })
     .returning()
+
+  await applyRecurringToBudget(id, auth.userId)
 
   const itemWithRelations = await db.query.budgetItems.findFirst({
     where: eq(budgetItems.id, item!.id),

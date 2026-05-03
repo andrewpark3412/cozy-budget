@@ -4,6 +4,7 @@ import { db } from '@/db'
 import { budgets, budgetItems } from '@/db/schema'
 import { requireAuth } from '@/middleware/requireAuth'
 import { parseBody } from '@/lib/validation'
+import { applyRecurringToBudget } from '@/lib/applyRecurring'
 import { copyBudgetSchema } from '@cozy-budget/shared'
 
 // POST /api/budgets/:id/copy
@@ -64,6 +65,7 @@ export async function POST(
   }))
 
   await db.insert(budgetItems).values(newItems)
+  await applyRecurringToBudget(id, auth.userId)
 
   // Return the updated budget with items
   const updated = await db.query.budgets.findFirst({

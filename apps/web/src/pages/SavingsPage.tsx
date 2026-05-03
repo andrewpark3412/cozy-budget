@@ -32,7 +32,7 @@ import {
   useDeleteSavingsGoal,
   useContributeToGoal,
 } from '@/hooks/useSavingsGoals'
-import { formatCurrency } from '@/lib/formatters'
+import { centsToDollars, dollarsToCents, formatCurrency, todayISO } from '@/lib/formatters'
 import type { SavingsGoal } from '@cozy-budget/shared'
 
 // --------------- form schemas ---------------
@@ -52,8 +52,6 @@ type ContributeForm = z.infer<typeof contributeFormSchema>
 // --------------- helpers ---------------
 const pct = (goal: SavingsGoal) =>
   goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0
-
-const today = () => new Date().toISOString().slice(0, 10)
 
 // --------------- sub-components ---------------
 const GoalCard = ({
@@ -152,14 +150,14 @@ const SavingsPage = () => {
     setEditingGoal(goal)
     goalForm.reset({
       name: goal.name,
-      targetAmountDollars: (goal.targetAmount / 100).toFixed(2),
+      targetAmountDollars: centsToDollars(goal.targetAmount),
       targetDate: goal.targetDate ?? '',
     })
     setDialogOpen(true)
   }
 
   const onSubmitGoal = (values: GoalForm) => {
-    const targetAmount = Math.round(parseFloat(values.targetAmountDollars) * 100)
+    const targetAmount = dollarsToCents(values.targetAmountDollars)
     const targetDate = values.targetDate || null
 
     if (editingGoal) {
@@ -177,7 +175,7 @@ const SavingsPage = () => {
 
   const onContribute = (values: ContributeForm) => {
     if (!contributeTarget) return
-    const amount = Math.round(parseFloat(values.amountDollars) * 100)
+    const amount = dollarsToCents(values.amountDollars)
     contribute.mutate(
       { id: contributeTarget.id, amount, date: values.date },
       {
@@ -247,7 +245,7 @@ const SavingsPage = () => {
               onDelete={setDeleteTarget}
               onContribute={(goal) => {
                 setContributeTarget(goal)
-                contributeForm.reset({ amountDollars: '', date: today() })
+                contributeForm.reset({ amountDollars: '', date: todayISO() })
               }}
             />
           ))}

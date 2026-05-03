@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
+import { getPreviousMonthYear } from '@/lib/formatters'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -37,8 +38,10 @@ const CopyBudgetDialog = ({ open, onOpenChange, currentMonth, currentYear, onCop
   const { toast } = useToast()
 
   // Default to previous month
-  const defaultMonth = currentMonth === 1 ? 12 : currentMonth - 1
-  const defaultYear = currentMonth === 1 ? currentYear - 1 : currentYear
+  const { month: defaultMonth, year: defaultYear } = getPreviousMonthYear(
+    currentMonth,
+    currentYear,
+  )
 
   const yearOptions = Array.from({ length: 7 }, (_, i) => currentYear - 3 + i)
 

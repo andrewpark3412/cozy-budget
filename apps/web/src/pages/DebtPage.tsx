@@ -45,7 +45,7 @@ import {
   useRecordPayment,
   useReorderDebts,
 } from '@/hooks/useDebts'
-import { formatCurrency } from '@/lib/formatters'
+import { centsToDollars, dollarsToCents, formatCurrency, todayISO } from '@/lib/formatters'
 import type { Debt } from '@cozy-budget/shared'
 
 // ---- form schemas ----
@@ -63,8 +63,6 @@ const paymentFormSchema = z.object({
   paymentDate: z.string().min(1, 'Date is required'),
 })
 type PaymentForm = z.infer<typeof paymentFormSchema>
-
-const today = () => new Date().toISOString().slice(0, 10)
 
 const paidPct = (d: Debt) =>
   d.originalBalance > 0
@@ -255,19 +253,19 @@ const DebtPage = () => {
     setEditingDebt(debt)
     debtForm.reset({
       name: debt.name,
-      originalBalanceDollars: (debt.originalBalance / 100).toFixed(2),
-      currentBalanceDollars: (debt.currentBalance / 100).toFixed(2),
+      originalBalanceDollars: centsToDollars(debt.originalBalance),
+      currentBalanceDollars: centsToDollars(debt.currentBalance),
       interestRate: String(debt.interestRate),
-      minimumPaymentDollars: (debt.minimumPayment / 100).toFixed(2),
+      minimumPaymentDollars: centsToDollars(debt.minimumPayment),
     })
     setDialogOpen(true)
   }
 
   const onSubmitDebt = (values: DebtForm) => {
-    const originalBalance = Math.round(parseFloat(values.originalBalanceDollars) * 100)
-    const currentBalance = Math.round(parseFloat(values.currentBalanceDollars) * 100)
-    const interestRate = parseFloat(values.interestRate)
-    const minimumPayment = Math.round(parseFloat(values.minimumPaymentDollars) * 100)
+    const originalBalance = dollarsToCents(values.originalBalanceDollars)
+    const currentBalance = dollarsToCents(values.currentBalanceDollars)
+    const interestRate = Number.parseFloat(values.interestRate)
+    const minimumPayment = dollarsToCents(values.minimumPaymentDollars)
 
     if (editingDebt) {
       updateDebt.mutate(
@@ -284,7 +282,7 @@ const DebtPage = () => {
 
   const onSubmitPayment = (values: PaymentForm) => {
     if (!payTarget) return
-    const amount = Math.round(parseFloat(values.amountDollars) * 100)
+    const amount = dollarsToCents(values.amountDollars)
     recordPayment.mutate(
       { id: payTarget.id, amount, paymentDate: values.paymentDate },
       {
@@ -379,7 +377,10 @@ const DebtPage = () => {
               onDelete={setDeleteTarget}
               onPay={(d) => {
                 setPayTarget(d)
-                payForm.reset({ amountDollars: (d.minimumPayment / 100).toFixed(2), paymentDate: today() })
+                payForm.reset({
+                  amountDollars: centsToDollars(d.minimumPayment),
+                  paymentDate: todayISO(),
+                })
               }}
               onMoveUp={() => move(idx, 'up')}
               onMoveDown={() => move(idx, 'down')}

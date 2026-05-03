@@ -4,13 +4,13 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { todayISO } from '@/lib/formatters'
+import { dollarsToCents, isValidAmountInput, todayISO } from '@/lib/formatters'
 
 const schema = z.object({
   amount: z
     .string()
     .min(1, 'Amount is required')
-    .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) > 0, 'Must be a positive number'),
+    .refine((v) => isValidAmountInput(v, 0.01), 'Must be a positive number'),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Required'),
   note: z.string().max(500).optional(),
 })
@@ -33,7 +33,7 @@ const AddTransactionForm = ({ onAdd }: Props) => {
   })
 
   const onSubmit = async (data: FormValues) => {
-    const cents = Math.round(parseFloat(data.amount) * 100)
+    const cents = dollarsToCents(data.amount)
     await onAdd(cents, data.date, data.note?.trim() || null)
     reset({ date: todayISO(), note: '' })
   }
